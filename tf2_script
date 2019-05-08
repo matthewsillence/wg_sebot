@@ -1,0 +1,45 @@
+### This Python script is based on the TensorFlow for Poets 2 scripts available through GitHub and relies on a local folder 'Sebald', which contains three sub-folders: 'Documents', 'People', 'Places'.
+
+pip install --upgrade "tensorflow==1.7.*"
+
+git clone https://github.com/googlecodelabs/tensorflow-for-poets-2
+cd tensorflow-for-poets-2
+
+IMAGE_SIZE=224
+ARCHITECTURE="mobilenet_0.50_${IMAGE_SIZE}"
+
+### Run the training
+python -m scripts.retrain \
+  --bottleneck_dir=tf_files/bottlenecks \
+  --how_many_training_steps=500 \
+  --model_dir=tf_files/models/ \
+  --summaries_dir=tf_files/training_summaries/"${ARCHITECTURE}" \
+  --output_graph=tf_files/retrained_graph.pb \
+  --output_labels=tf_files/retrained_labels.txt \
+  --architecture="${ARCHITECTURE}" \
+  --image_dir=tf_files/sebald
+
+### After the training cycles, you can view TensorBoard at the following link in your browser:
+
+### http://0.0.0.0:6006/
+
+### The retraining script writes data to the following two files:
+
+### tf_files/retrained_graph.pb, which contains a version of the selected network with a final layer retrained on your categories.
+### tf_files/retrained_labels.txt, which is a text file containing labels.
+
+### Run the image classification script.
+
+python -m scripts.label_image -h
+
+### Add an example of an image from the folder that you want to test:
+
+python -m scripts.label_image \
+    --graph=tf_files/retrained_graph.pb  \
+    --image=tf_files/sebald/[...]/[...].jpg
+
+### Test an 'unseen' image file by using the same code and location of the new file:
+
+python -m scripts.label_image \
+    --graph=tf_files/retrained_graph.pb  \
+    --image=tf_files/[...]/[...]/[...].jpg
